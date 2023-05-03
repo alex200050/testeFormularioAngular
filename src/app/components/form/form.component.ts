@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, ControlContainer, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { ICountry, listCountries } from 'src/app/interface/countries';
-import { nifValidator } from 'src/app/shared/material/nif.validator';
 
 @Component({
   selector: 'app-form',
@@ -60,6 +59,19 @@ export class FormComponent implements OnInit{
     }
     return null;
   }
+
+  validateNIF(nif: AbstractControl): ValidationErrors | null {
+    const value = nif.value?.toString() || '';
+    if (!['1', '2', '3', '5', '6', '8'].includes(value.substring(0, 1)) &&
+        !['45', '70', '71', '72', '77', '79', '90', '91', '98', '99'].includes(value.substring(0, 2))) {
+      return { invalidNif: true };
+    }
+    const total = Number(value[0]) * 9 + Number(value[1]) * 8 + Number(value[2]) * 7 + Number(value[3]) * 6
+      + Number(value[4]) * 5 + Number(value[5]) * 4 + Number(value[6]) * 3 + Number(value[7]) * 2;
+    const modulo11 = total - Math.trunc(total / 11) * 11;
+    const comparador = modulo11 === 1 || modulo11 === 0 ? 0 : 11 - modulo11;
+    return Number(value[8]) === comparador ? null : { invalidNif: true };
+  }
   
 
   ngOnInit():void {
@@ -67,8 +79,7 @@ export class FormComponent implements OnInit{
     this.formGroup = new FormGroup({
       fullName: new FormControl('', [Validators.required, Validators.minLength(3)]),
       email: new FormControl('', [Validators.required, Validators.email]),
-      //nif: new FormControl('', [Validators.required, this.validateExpressions(/^([1-9])(\d{7})([0-9]|[A-Z]){1}$/)]),
-      nif: new FormControl('', [Validators.required, nifValidator]),
+      nif: new FormControl('', [Validators.required, this.validateNIF]),
       birthDate: new FormControl(new Date(), [Validators.required, this.validateAge]),
       country: new FormControl('', [Validators.required]),
       city: new FormControl('', [Validators.required]),
