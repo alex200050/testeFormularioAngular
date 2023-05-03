@@ -25,7 +25,7 @@
         </mat-form-field>
 
         <mat-form-field appearance="fill">
-            <mat-label>País</mat-label>
+            <mat-label>Country</mat-label>
             <mat-select (selectionChange)="countrySwitch($event.value)" [(value)]="selectedCountry" formControlName="country">
               <mat-option *ngFor="let x of listCountries" [value]="x.name">
                 {{x.name}}
@@ -34,7 +34,7 @@
         </mat-form-field>
 
         <mat-form-field appearance="fill">
-            <mat-label>Cidade</mat-label>
+            <mat-label>City</mat-label>
             <mat-select [attr.disabled]="getCities().length ? false : true" [(value)]="selectedCity" formControlName="city">
               <mat-option *ngFor="let x of getCities()" [value]="x.name">
                 {{x.name}}
