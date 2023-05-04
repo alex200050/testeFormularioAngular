@@ -74,26 +74,31 @@ export class FormComponent implements OnInit{
   }
   
 
+  submitForm(){
+    console.log(this.formGroup.value);
+  }
+
   ngOnInit():void {
 
     this.formGroup = new FormGroup({
       fullName: new FormControl('', [Validators.required, Validators.minLength(3)]),
-      email: new FormControl('', [Validators.required, Validators.email]),
-      nif: new FormControl('', [Validators.required, this.validateNIF]),
+      email: new FormControl('', [Validators.required, this.validateExpressions(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)]),
+      nif: new FormControl('', [Validators.required, this.validateNIF, Validators.maxLength(9), Validators.minLength(9)]),
       birthDate: new FormControl(new Date(), [Validators.required, this.validateAge]),
       country: new FormControl('', [Validators.required]),
       city: new FormControl('', [Validators.required]),
       address: new FormControl('', [Validators.required]),
       postalCode: new FormControl('',),
-      phone: new FormControl('', [Validators.required, this.validateExpressions(/^([329]\d{8})$/)]),
+      phone: new FormControl('', [Validators.required, this.validateExpressions(/^([329]\d{8})$/), Validators.maxLength(9), Validators.minLength(9)]),
       gender: new FormControl('', [Validators.required]),
     });
 
     this.formGroup.valueChanges.subscribe(value => {
-      console.log(value);
+      console.log(this.formGroup.valid);
     })
   
     this.formGroup.get('country')?.valueChanges.subscribe(country => {
+      this.formGroup.get('postalCode')?.setValue('');
       if(country === 'Portugal'){
         this.formGroup.get('postalCode')?.setValidators([Validators.required, this.validateExpressions(/^(\d{4})-(\d{3})$/), Validators.pattern(/^[0-9-]*$/)]);
       }
